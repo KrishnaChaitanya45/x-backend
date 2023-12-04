@@ -1,0 +1,27 @@
+version: '3'
+services:
+  auth:
+    build:
+      context: .
+      args:
+        - NODE_ENV=development
+    volumes:
+      - .:/learningPlatform/code
+      - /learningPlatform/code/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm run start:dev
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=nishant
+      - POSTGRES_PASSWORD=nisthant
+      - POSTGRES_DB=learningPlatform
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+volumes:
+  postgresql:

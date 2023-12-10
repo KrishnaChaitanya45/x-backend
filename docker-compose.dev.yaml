@@ -1,27 +1,26 @@
 version: '3'
 services:
-  auth:
+  api-gateway:
     build:
       context: .
+      target: development
       args:
         - NODE_ENV=development
     volumes:
-      - .:/learningPlatform/code
-      - /learningPlatform/code/node_modules
+      - .:/learningPlatform/code/api-gateway
+      - /learningPlatform/code/api-gateway/node_modules
     environment:
       - NODE_ENV=development
-    command: npm run start:dev
-    depends_on:
-      - postgres
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      - POSTGRES_USER=nishant
-      - POSTGRES_PASSWORD=nisthant
-      - POSTGRES_DB=learningPlatform
+    command: npm run start:dev api-gateway
+  auth:
+    build:
+      context: .
+      target: development
+      args:
+        - NODE_ENV=development
     volumes:
-      - postgresql:/var/lib/postgresql/data
-    ports:
-      - 5432:5432
-volumes:
-  postgresql:
+      - .:/learningPlatform/code/auth
+      - /learningPlatform/code/auth/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm run start:dev auth

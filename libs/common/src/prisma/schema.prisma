@@ -1,0 +1,89 @@
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://krishna:krishna@localhost:5440/learningPlatform?schema=public"
+}
+
+model Test {
+  id Int @id @default(autoincrement())
+  name String 
+}
+
+
+model User {
+  id String @id @default(uuid())
+  user_name String @unique
+  first_name String?
+  last_name String?
+  password String
+  email String @unique
+  phone_number BigInt?
+  skills Skills[] 
+  education String?
+  achievements Json?
+  interests String[] @default([])
+  location String?
+  work_experience Json?
+  socials Json?
+  courses_enrolled Courses[]
+  communities Community[]
+  badges Badges[]
+  refreshToken String?
+  profilePhoto String?
+}
+
+model Skills{
+id String @id @default(uuid())
+name String @unique()
+description String
+users User[]
+wars Wars[]
+courses Courses[]
+}
+model Courses{
+id String @id @default(uuid())
+name String
+description String
+skills Skills[]
+students User[]
+communities Community[]
+}
+
+model Community{
+  id String @id @default(uuid())
+  name String
+  description String
+  members User[] 
+  courses Courses[]
+  wars Wars[] 
+  awards Awards[]
+}
+
+model Awards {
+  id String @id @default(uuid())
+  name String
+  description String
+  communities Community[]
+  
+}
+
+model Wars{
+id String @id @default(uuid())
+name String
+description String
+skills Skills[]
+communities Community[]
+}
+
+model Badges {
+id String @id @default(uuid())
+name String
+description String
+users User[]
+
+}

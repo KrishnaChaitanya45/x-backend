@@ -3,11 +3,13 @@ services:
   nginx:
     ports:
       - '80:80'
-  auth:
+  api-gateway:
     build:
-      context: .
+      target: production
       args:
         - NODE_ENV=production
-    environment:
-      - NODE_ENV=production
-    command: node ./dist/main.js
+  auth:
+    build:
+      target: production
+      args:
+        - NODE_ENV=production

@@ -1,13 +1,56 @@
 version: '3'
 services:
-  nginx:
-    image: nginx:stable-alpine
-    ports:
-      - '3000:80'
+  rabbitmq:
+    image: rabbitmq:3.12.10-management-alpine
+    container_name: rabbitMQServer
+    networks:
+      - mynetwork
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - /var/lib/rabbitmq
+    env_file:
+      - .env
+    ports:
+      - '5672:5672'
+      - '15672:15672'
 
-  auth:
-    build: .
+  # api-gateway:
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/api-gateway/Dockerfile
+  #   depends_on:
+  #     - basePostgresDB
+  #     - rabbitmq
+  #   networks:
+  #     - mynetwork
+  #   ports:
+  #     - '5000:5000'
+
+  # auth:
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/auth/Dockerfile
+  #   depends_on:
+  #     - api-gateway
+  #   networks:
+  #     - mynetwork
+  #   ports:
+  #     - '5001:5001'
+
+  basePostgresDB:
+    image: postgres:16.1-alpine
+    restart: always
     environment:
-      - PORT=3000
+      POSTGRES_DB: learningPlatform
+      POSTGRES_USER: krishna
+      POSTGRES_PASSWORD: krishna
+    ports:
+      - '5440:5432'
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+
+networks:
+  mynetwork:
+    driver: bridge
+
+volumes:
+  postgresql:

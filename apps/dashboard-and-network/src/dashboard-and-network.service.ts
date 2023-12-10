@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class AppService {
+export class DashboardAndNetworkService {
   getHello(): string {
-    return 'RANDOM ';
+    return 'Hello World!';
   }
 }

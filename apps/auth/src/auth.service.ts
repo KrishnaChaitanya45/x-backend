@@ -134,7 +134,7 @@ export class AuthService {
         location,
         socials,
         achievements,
-        skills,
+        // skills,
         work_experience,
       } = body;
       const updateUser = await this.prisma.user.update({
@@ -145,7 +145,7 @@ export class AuthService {
           first_name,
           last_name,
           //@ts-ignore
-          skills: skills,
+          // skills: skills,
           education,
           achievements,
           work_experience,

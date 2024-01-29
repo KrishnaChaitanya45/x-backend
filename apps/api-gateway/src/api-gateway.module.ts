@@ -12,6 +12,8 @@ import { JwtModule } from '@nestjs/jwt';
       envFilePath: './.env',
     }),
     RmqModule.register({ name: 'auth' }),
+    RmqModule.register({ name: 'streaming' }),
+    RmqModule.register({ name: 'community' }),
     JwtModule.register({}),
   ],
   controllers: [ApiGatewayController],

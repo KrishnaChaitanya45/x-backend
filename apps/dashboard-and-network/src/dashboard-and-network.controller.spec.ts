@@ -11,7 +11,9 @@ describe('DashboardAndNetworkController', () => {
       providers: [DashboardAndNetworkService],
     }).compile();
 
-    dashboardAndNetworkController = app.get<DashboardAndNetworkController>(DashboardAndNetworkController);
+    dashboardAndNetworkController = app.get<DashboardAndNetworkController>(
+      DashboardAndNetworkController,
+    );
   });
 
   describe('root', () => {

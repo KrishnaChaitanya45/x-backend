@@ -5,7 +5,7 @@ import * as argon from 'argon2';
 import * as bcrypt from 'bcrypt';
 import { v2 } from 'cloudinary';
 import { Readable } from 'stream';
-const streamifier = require('streamifier');
+
 @Injectable()
 export class UtilsService {
   constructor(
@@ -39,12 +39,27 @@ export class UtilsService {
       refreshToken,
     };
   }
-  async updateRefreshTokenHash(userId: string, refreshToken: string) {
+  async updateRefreshTokenHash(
+    userId: string,
+    refreshToken: string,
+    isInstructor = false,
+  ) {
     const hash = await argon.hash(refreshToken);
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { refreshToken: hash },
-    });
+    if (isInstructor) {
+      await this.prisma.instructors.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          refreshToken: hash,
+        },
+      });
+    } else {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { refreshToken: hash },
+      });
+    }
   }
   async uploadImage(image: any) {
     try {

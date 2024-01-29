@@ -12,7 +12,7 @@ export class BasePostgresDBService
         db: {
           url:
             process.env.DATABASE_URL ||
-            'postgresql://krishna:krishna@localhost:5440/learningPlatform?schema=public',
+            'postgresql://krishna:krishna@localhost:5432/learningPlatform?schema=public',
         },
       },
     });

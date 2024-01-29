@@ -6,7 +6,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://krishna:krishna@localhost:5440/learningPlatform?schema=public"
+  url      = "postgresql://krishna:krishna@localhost:5432/learningPlatform?schema=public"
 }
 
 model Test {
@@ -30,11 +30,46 @@ model User {
   location String?
   work_experience Json?
   socials Json?
-  courses_enrolled Courses[]
-  communities Community[]
+  courses_enrolled Course[]
+  communities Community[] @relation("CommunityMembers")
   badges Badges[]
   refreshToken String?
   profilePhoto String?
+  moderator Community[] @relation("CommunityModerators")
+}
+
+model VerificationRequests{
+  request_id String @id @default(uuid())
+  instructor Instructors? @relation(fields: [instructor_id], references: [id])
+  instructor_id String @unique
+  verified Boolean
+  requested_on DateTime
+  expires_on DateTime
+}
+
+
+model Instructors {
+  id String @id @default(uuid()) 
+  user_name String @unique
+  first_name String?
+  last_name String?
+  password String
+  email String @unique
+  phone_number String?
+  skills Skills[]
+  verification VerificationRequests? 
+  education String?
+  verificationId String? @unique
+  verified Boolean
+  profilePhoto String?
+  badges Badges[]
+  courses_created Course[]
+  refreshToken String?
+  achievements Json?
+  interests String[] @default([])
+  location String?
+  work_experience Json?
+  socials Json?
 }
 
 model Skills{
@@ -43,33 +78,82 @@ name String @unique()
 description String
 users User[]
 wars Wars[]
-courses Courses[]
+courses Course[]
+instructors Instructors[]
 }
-model Courses{
-id String @id @default(uuid())
-name String
-description String
-skills Skills[]
-students User[]
-communities Community[]
+model Course{
+  name String
+  id String @id @default(uuid())
+  description String
+  skills Skills[]
+  communities Community[]
+  students User[] 
+  instructor Instructors[] 
+  rewards Json?
+  level Json?
+  tags String[]
+  unique_name String
+  icon String?
+  bg_image String?
+  cost Int
+  modules Module[]
+
+}
+
+model Module{
+  id String @id @default(uuid())
+  title String
+  description String
+  rewards Json?
+  level Json?
+  tags String[]
+  unique_name String?
+  icon String?
+  bg_image String?
+  content CourseContent[]
+  course Course[]
+}
+
+model CourseContent{
+  id String @id @default(uuid())
+  title String
+  description String
+  rewards Json?
+  level Json?
+  video_link String?
+  isVideo Boolean
+  resource_link String[]
+  tags String[]
+  unique_name String?
+  icon String?
+  bg_image String?
+  modules Module[]
+  challenges Json?
 }
 
 model Community{
   id String @id @default(uuid())
   name String
   description String
-  members User[] 
-  courses Courses[]
+  rules String[]
+  icon String?
+  bg_image String
+  tags String[]
+  unique_name String
+  level Json?
+  moderators User[] @relation("CommunityModerators")
+  members User[] @relation("CommunityMembers")
+  courses Course[]
   wars Wars[] 
   awards Awards[]
 }
+
 
 model Awards {
   id String @id @default(uuid())
   name String
   description String
   communities Community[]
-  
 }
 
 model Wars{
@@ -85,5 +169,6 @@ id String @id @default(uuid())
 name String
 description String
 users User[]
+instructors Instructors[]
 
 }

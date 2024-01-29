@@ -45,6 +45,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
       }
+    },
+    "streaming": {
+      "type": "application",
+      "root": "apps/streaming",
+      "entryFile": "main",
+      "sourceRoot": "apps/streaming/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/streaming/tsconfig.app.json"
+      }
     }
   }
 }

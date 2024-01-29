@@ -12,6 +12,18 @@ services:
     environment:
       - NODE_ENV=development
     command: npm run start:dev api-gateway
+  dashboard-and-networking:
+    build:
+      context: .
+      target: development
+      args:
+        - NODE_ENV=development
+    volumes:
+      - .:/learningPlatform/code/dashboard-and-network
+      - /learningPlatform/code/dashboard-and-network/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm run start:dev dashboard-and-network
   auth:
     build:
       context: .
@@ -24,3 +36,15 @@ services:
     environment:
       - NODE_ENV=development
     command: npm run start:dev auth
+  streaming:
+    build:
+      context: .
+      target: development
+      args:
+        - NODE_ENV=development
+    volumes:
+      - .:/learningPlatform/code/streaming
+      - /learningPlatform/code/streaming/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm run start:dev streaming

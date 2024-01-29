@@ -14,16 +14,14 @@
     "skipLibCheck": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "y/common": [
-        "libs/common/src"
-      ],
-      "y/common/*": [
-        "libs/common/src/*"
-      ]
+      "y/common": ["libs/common/src"],
+      "y/common/*": ["libs/common/src/*"]
     }
   },
   "watchOptions": {

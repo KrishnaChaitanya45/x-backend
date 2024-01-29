@@ -12,29 +12,50 @@ services:
     ports:
       - '5672:5672'
       - '15672:15672'
-
-  # api-gateway:
+  # dashboard-and-networking:
   #   build:
   #     context: .
-  #     dockerfile: ./apps/api-gateway/Dockerfile
+  #     dockerfile: ./apps/dashboard-and-network/Dockerfile
   #   depends_on:
   #     - basePostgresDB
   #     - rabbitmq
   #   networks:
   #     - mynetwork
   #   ports:
-  #     - '5000:5000'
+  #     - '5003:5003'
 
-  # auth:
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/auth/Dockerfile
-  #   depends_on:
-  #     - api-gateway
-  #   networks:
-  #     - mynetwork
-  #   ports:
-  #     - '5001:5001'
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ./apps/api-gateway/Dockerfile
+    depends_on:
+      - basePostgresDB
+      - rabbitmq
+    networks:
+      - mynetwork
+    ports:
+      - '5000:5000'
+
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+    depends_on:
+      - api-gateway
+    networks:
+      - mynetwork
+    ports:
+      - '5001:5001'
+  streaming:
+    build:
+      context: .
+      dockerfile: ./apps/streaming/Dockerfile
+    depends_on:
+      - api-gateway
+    networks:
+      - mynetwork
+    ports:
+      - '5002:5002'
 
   basePostgresDB:
     image: postgres:16.1-alpine
@@ -44,7 +65,7 @@ services:
       POSTGRES_USER: krishna
       POSTGRES_PASSWORD: krishna
     ports:
-      - '5440:5432'
+      - '5432:5432'
     volumes:
       - postgresql:/var/lib/postgresql/data
 

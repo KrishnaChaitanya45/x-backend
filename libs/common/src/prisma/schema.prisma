@@ -108,6 +108,7 @@ model Module{
   level Json?
   tags String[]
   unique_name String?
+  topics Json
   icon String?
   bg_image String?
   content CourseContent[]
@@ -121,13 +122,15 @@ model CourseContent{
   rewards Json?
   level Json?
   video_link String?
+  topics Json
   isVideo Boolean
   resource_link String[]
   tags String[]
   unique_name String?
   icon String?
   bg_image String?
-  modules Module[]
+  module Module @relation(fields: [module_id], references: [id])
+  module_id String  
   challenges Json?
 }
 

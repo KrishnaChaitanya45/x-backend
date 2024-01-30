@@ -8,7 +8,7 @@ import {
 } from 'y/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { UtilsService } from 'apps/auth/utils/utils.service';
+import { UtilsService } from 'y/common';
 
 @Module({
   imports: [

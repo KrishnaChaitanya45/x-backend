@@ -21,11 +21,43 @@ export class DashboardAndNetworkController {
 
   @MessagePattern('CREATE_COURSE')
   async createCourse(@Ctx() ctx: RmqContext) {
-    console.log('REACHED HERE TWO..!');
     const {
       data: { body, user },
     } = JSON.parse(ctx.getMessage().content.toString());
-    console.log('BODY', body, user);
-    return this.dashboardAndNetworkService.createCourse(body);
+    return this.dashboardAndNetworkService.createCourse(body, user);
+  }
+
+  @MessagePattern('GET_COURSES_OF_INSTRUCTOR')
+  async getCoursesOfInstructor(@Ctx() ctx: RmqContext) {
+    const {
+      data: { instructor_id },
+    } = JSON.parse(ctx.getMessage().content.toString());
+    return this.dashboardAndNetworkService.getCoursesOfInstructor(
+      instructor_id,
+    );
+  }
+
+  @MessagePattern('GET_SINGLE_COURSE')
+  async getSingleCourse(@Ctx() ctx: RmqContext) {
+    const {
+      data: { course_id },
+    } = JSON.parse(ctx.getMessage().content.toString());
+    return this.dashboardAndNetworkService.getSingleCourse(course_id);
+  }
+
+  @MessagePattern('ADD_MODULE')
+  async addModule(@Ctx() ctx: RmqContext) {
+    const {
+      data: { body, course_id },
+    } = JSON.parse(ctx.getMessage().content.toString());
+    return this.dashboardAndNetworkService.addModule(body, course_id);
+  }
+
+  @MessagePattern('ADD_COURSE_CONTENT')
+  async addCourseContent(@Ctx() ctx: RmqContext) {
+    const {
+      data: { body, module_id },
+    } = JSON.parse(ctx.getMessage().content.toString());
+    return this.dashboardAndNetworkService.addCourseContent(body, module_id);
   }
 }

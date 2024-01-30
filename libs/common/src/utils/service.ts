@@ -5,6 +5,7 @@ import * as argon from 'argon2';
 import * as bcrypt from 'bcrypt';
 import { v2 } from 'cloudinary';
 import { Readable } from 'stream';
+import { DecodedUserObject } from 'libs/common/types/user/DECODED_USER';
 
 @Injectable()
 export class UtilsService {
@@ -88,6 +89,57 @@ export class UtilsService {
         message: 'upload failed',
         success: false,
       };
+    }
+  }
+
+  async checkIsInstructor(instructor_id: string) {
+    try {
+      const instructor = await this.prisma.instructors.findUnique({
+        where: {
+          id: instructor_id,
+        },
+      });
+
+      if (!instructor) {
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  }
+
+  async validUser(user_id: string) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: user_id,
+        },
+      });
+      if (!user) {
+        return false;
+      }
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async verifyAccessToken(
+    accessToken: string,
+  ): Promise<DecodedUserObject | null> {
+    try {
+      const user = await this.jwtService.verifyAsync(accessToken, {
+        secret:
+          'c4ae807915c0e423948fb7172b4ae0337ba61820b15ff91e89062f32342a0cd6285e3f4a7f36ebc589ece5e732445b0cd2980fb82f8d77da831c37ec7d3e563b',
+      });
+
+      user.userId = user.sub;
+      delete user.sub;
+      return user;
+    } catch (error) {
+      return null;
     }
   }
 }

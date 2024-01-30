@@ -3,7 +3,7 @@ import { BasePostgresDBService } from 'y/common';
 import { ForbiddenException } from '@nestjs/common/exceptions';
 import * as bcrypt from 'bcrypt';
 import { loginUserDTO } from '../dto/login-user.dto';
-import { UtilsService } from '../utils/utils.service';
+import { UtilsService } from 'y/common';
 import { CreateProfileDTO } from '../dto/create-user-profile.dto';
 @Injectable()
 export class AuthService {
@@ -152,20 +152,18 @@ export class AuthService {
     }
   }
 
-  async loginInstructor(body: any) {
+  async loginInstructor(body: { email: string; password: string }) {
     try {
       const instructors = await this.prisma.instructors.findMany();
-      console.log('INSTRUCTORS', instructors);
       const instructor = await this.prisma.instructors.findFirst({
         where: {
           email: body.email,
         },
       });
-      console.log('USER', instructor);
       if (!instructor) {
         return {
           success: false,
-          error: 'USER NOT FOUND',
+          error: 'INSTRUCTOR NOT FOUND',
         };
       }
       const isPasswordValid = await bcrypt.compare(
@@ -268,6 +266,21 @@ export class AuthService {
       return {
         success: false,
         error: error,
+      };
+    }
+  }
+
+  async getAllInstructors() {
+    try {
+      const instructors = await this.prisma.instructors.findMany();
+      return {
+        success: true,
+        instructors,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error,
       };
     }
   }

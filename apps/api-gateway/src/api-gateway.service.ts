@@ -11,6 +11,8 @@ import {
   LOGIN_INSTRUCTOR_DTO,
 } from './dto/Instructor.dto';
 import { CREATE_COURSE_DTO } from './dto/Course.dto';
+import { CREATE_MODULE } from 'libs/common/types/course/CREATE_MODULE';
+import { COURSE_CONTENT } from 'libs/common/types/course/CREATE_COURSE_CONTENT';
 type RegisterResponse = {
   success: boolean;
   error?: any;
@@ -94,7 +96,6 @@ export class ApiGatewayService {
     user: any,
   ) {
     try {
-      console.log('REACHED HERE ONE..!');
       const result = this.authService.send('UPDATE_PROFILE_PHOTO', {
         file,
         user,
@@ -135,7 +136,7 @@ export class ApiGatewayService {
       });
     }
   }
-  async test(file: Express.Multer.File, @Res() res: Response) {
+  async uploadVideo(file: Express.Multer.File, @Res() res: Response) {
     try {
       const result = (await lastValueFrom(
         this.streamService.send('UPLOAD_VIDEO', file),
@@ -301,6 +302,29 @@ export class ApiGatewayService {
       const returnedResult = await lastValueFrom(
         response.pipe(map((res) => res)),
       );
+      if (returnedResult.success) {
+        return res.json(returnedResult);
+      }
+      return res.status(401).json(returnedResult);
+    } catch (error) {
+      return res.status(500).json({
+        message: 'Internal Server Error',
+        error,
+      });
+    }
+  }
+
+  async getAllCourses(instructor_id: string, @Res() res: Response) {
+    try {
+      const response = await this.communityService.send(
+        'GET_COURSES_OF_INSTRUCTOR',
+        {
+          instructor_id,
+        },
+      );
+      const returnedResult = await lastValueFrom(
+        response.pipe(map((res) => res)),
+      );
       console.log('RETURNED RESULT', returnedResult);
       if (returnedResult.success) {
         return res.json(returnedResult);
@@ -310,6 +334,92 @@ export class ApiGatewayService {
       return res.status(500).json({
         message: 'Internal Server Error',
         error,
+      });
+    }
+  }
+
+  async getAllInstructors(@Res() res: Response) {
+    try {
+      const response = await this.authService.send('GET_ALL_INSTRUCTORS', {});
+      const returnedResult = await lastValueFrom(
+        response.pipe(map((res) => res)),
+      );
+      if (returnedResult.success) {
+        return res.status(200).json(returnedResult);
+      }
+      return res.status(401).json(returnedResult);
+    } catch (error) {
+      return res.status(500).json({
+        message: 'INTERNAL SERVER ERROR',
+      });
+    }
+  }
+  async addModule(
+    instructor_id: string,
+    body: CREATE_MODULE,
+    course_id: string,
+    @Res() res: Response,
+  ) {
+    try {
+      const response = await this.communityService.send('ADD_MODULE', {
+        instructor_id,
+        body,
+        course_id,
+      });
+
+      const returnedResult = await lastValueFrom(
+        response.pipe(map((res) => res)),
+      );
+      if (returnedResult.success) {
+        return res.status(200).json(returnedResult);
+      }
+      return res.status(401).json(returnedResult);
+    } catch (error) {
+      return res.status(500).json({
+        message: 'INTERNAL SERVER ERROR',
+      });
+    }
+  }
+  async getSingleCourse(course_id: string, @Res() res: Response) {
+    try {
+      const response = await this.communityService.send('GET_SINGLE_COURSE', {
+        course_id,
+      });
+      const returnedResult = await lastValueFrom(
+        response.pipe(map((res) => res)),
+      );
+      if (returnedResult.success) {
+        return res.status(200).json(returnedResult);
+      }
+      return res.status(401).json(returnedResult);
+    } catch (error) {
+      return res.status(500).json({
+        message: 'INTERNAL SERVER ERROR',
+      });
+    }
+  }
+
+  async addCourseContent(
+    body: COURSE_CONTENT,
+    @Res() res: Response,
+    module_id: string,
+  ) {
+    try {
+      const response = await this.communityService.send('ADD_COURSE_CONTENT', {
+        body,
+        module_id,
+      });
+      const returnedResult = await lastValueFrom(
+        response.pipe(map((res) => res)),
+      );
+      if (returnedResult.success) {
+        return res.status(200).json(returnedResult);
+      }
+      return res.status(401).json(returnedResult);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        message: 'INTERNAL SERVER ERROR',
       });
     }
   }

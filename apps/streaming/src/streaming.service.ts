@@ -6,7 +6,6 @@ import { Request, Response } from 'express';
 @Injectable()
 export class StreamingService {
   async uploadVideo(video: any) {
-    console.log(':REACHED HERE,', video);
     try {
       const bufferData = Buffer.from(video.data.buffer.data);
       console.log(':REACHED HERE,', bufferData);
@@ -25,7 +24,6 @@ export class StreamingService {
 
         readableStream.pipe(upload);
       })) as any;
-      console.log(':REACHED HERE,', uploadedImage);
       return {
         success: true,
         videoURL: uploadedImage.secure_url,

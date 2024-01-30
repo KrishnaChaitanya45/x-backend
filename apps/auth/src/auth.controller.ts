@@ -32,7 +32,6 @@ export class AuthController {
   }
   @MessagePattern('UPDATE_PROFILE_PHOTO')
   async updateProfilePhoto(@Ctx() context: RmqContext, @Body() body: any) {
-    console.log('REACHED HERE TWO..!');
     const {
       data: { file, user },
     } = JSON.parse(context.getMessage().content.toString());
@@ -46,5 +45,10 @@ export class AuthController {
       data: { body, user },
     } = JSON.parse(context.getMessage().content.toString());
     return this.authService.createUserProfile(body, user.userId);
+  }
+
+  @MessagePattern('GET_ALL_INSTRUCTORS')
+  async getAllInstructors(@Ctx() context: RmqContext) {
+    return this.authService.getAllInstructors();
   }
 }

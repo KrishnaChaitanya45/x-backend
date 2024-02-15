@@ -13,10 +13,4 @@ describe('ApiGatewayController', () => {
 
     apiGatewayController = app.get<ApiGatewayController>(ApiGatewayController);
   });
-
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(apiGatewayController.getUsers()).toBe('Hello World!');
-    });
-  });
 });

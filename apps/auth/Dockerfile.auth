@@ -1,0 +1,11 @@
+# Dockerfile.auth
+FROM base as development
+
+WORKDIR /app
+RUN npm run build auth
+
+FROM base as production
+
+WORKDIR /app
+COPY --from=development /app/dist ./dist
+CMD ["node", "dist/apps/auth/main"]

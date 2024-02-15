@@ -12,11 +12,22 @@ services:
     ports:
       - '5672:5672'
       - '15672:15672'
+  # dashboard-and-network:
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/dashboard-and-network/Dockerfile.dashboard-and-network
+  #   depends_on:
+  #     - basePostgresDB
+  #     - rabbitmq
+  #   networks:
+  #     - mynetwork
+  #   ports:
+  #     - '5003:5003'
 
   # api-gateway:
   #   build:
   #     context: .
-  #     dockerfile: ./apps/api-gateway/Dockerfile
+  #     dockerfile: ./apps/api-gateway/Dockerfile.api-gateway
   #   depends_on:
   #     - basePostgresDB
   #     - rabbitmq
@@ -35,6 +46,27 @@ services:
   #     - mynetwork
   #   ports:
   #     - '5001:5001'
+  # streaming:
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/streaming/Dockerfile.streaming
+  #   depends_on:
+  #     - api-gateway
+  #   networks:
+  #     - mynetwork
+  #   ports:
+  #     - '5002:5002'
+
+  video-processing:
+    build:
+      context: .
+      dockerfile: ./apps/video-processing/Dockerfile.video_processing
+    # depends_on:
+    #   - api-gateway
+    networks:
+      - mynetwork
+    ports:
+      - '5005:5005'
 
   basePostgresDB:
     image: postgres:16.1-alpine
@@ -44,13 +76,20 @@ services:
       POSTGRES_USER: krishna
       POSTGRES_PASSWORD: krishna
     ports:
-      - '5440:5432'
+      - '5432:5432'
     volumes:
       - postgresql:/var/lib/postgresql/data
-
+  redis:
+    image: redis:7.2.4-alpine
+    ports:
+      - 6379:6379
+    volumes:
+      - redis:/data
 networks:
   mynetwork:
     driver: bridge
 
 volumes:
+  redis:
+    driver: local
   postgresql:

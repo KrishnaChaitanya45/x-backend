@@ -243,7 +243,7 @@ export class AuthService {
         location,
         socials,
         achievements,
-        skills,
+        // skills,
         work_experience,
       } = body;
       const updateUser = await this.prisma.user.update({

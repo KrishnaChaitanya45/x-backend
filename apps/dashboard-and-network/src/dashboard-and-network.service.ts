@@ -270,13 +270,17 @@ export class DashboardAndNetworkService {
         level,
         video_link,
         unique_name,
+        topics,
         tags,
+        resource_link,
         icon,
         bg_image,
+        isVideo,
         challenges,
       } = body;
       if (
         !title ||
+        !isVideo ||
         !description ||
         !rewards ||
         !level ||
@@ -299,15 +303,17 @@ export class DashboardAndNetworkService {
         data: {
           title,
           description,
-          rewards,
-          level,
-          video_link,
-          unique_name,
-          tags,
-          icon,
+          isVideo,
+          topics,
           bg_image,
           challenges,
+          resource_link,
+          icon,
+          level,
           module_id,
+          unique_name,
+          tags,
+          video_link,
         },
       });
       return {

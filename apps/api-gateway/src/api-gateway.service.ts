@@ -1,4 +1,4 @@
-import { Injectable, Inject, Res } from '@nestjs/common';
+import { Injectable, Inject, Res, Body } from '@nestjs/common';
 import { RegisterDTO } from './dto/RegisterDTO.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { LoginUser } from './dto/LoginUser';
@@ -25,6 +25,8 @@ export class ApiGatewayService {
     @Inject('auth') private readonly authService: ClientProxy,
     @Inject('streaming') private readonly streamService: ClientProxy,
     @Inject('community') private readonly communityService: ClientProxy,
+    @Inject('video-processing')
+    private readonly videoProcessingService: ClientProxy,
   ) {}
   async loginUser(createUserDTO: LoginUser, @Res() res: Response) {
     try {
@@ -235,13 +237,26 @@ export class ApiGatewayService {
     }
   }
 
+  // async createInstructorProfile(
+  //   @Body() body: CREATE_INSTRUCTOR_DTO,
+  //   @Res() res: Response,
+  // ) {
+  //   try {
+  //     const result = (await this.authService.send(
+  //       'CREATE',
+  //       body,
+  //     )) as Observable<RegisterResponse>;
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
+
   async signUpInstructor(body: CREATE_INSTRUCTOR_DTO, @Res() res: Response) {
     try {
       console.log('REACHED HERE ONE..!', body);
-      const result = (await this.authService.send(
-        'REGISTER_INSTRUCTOR',
+      const result = (await this.authService.send('REGISTER_INSTRUCTOR', {
         body,
-      )) as Observable<RegisterResponse>;
+      })) as Observable<RegisterResponse>;
       const returnedResult = await lastValueFrom(
         result.pipe(map((res) => res)),
       );
@@ -259,6 +274,57 @@ export class ApiGatewayService {
       return res.status(401).json(returnedResult);
     } catch (error) {
       console.log('CREATE INSTRUCTOR EXCEPTION HAS BEEN HANDLED');
+      return res.status(500).json({
+        message: 'Internal Server Error',
+        error,
+      });
+    }
+  }
+
+  async createAdmin(body: RegisterDTO, @Res() res: Response) {
+    try {
+      const response = await this.authService.send('REGISTER_ADMIN', body);
+      const returnedResult = await lastValueFrom(
+        response.pipe(map((res) => res)),
+      );
+      if (returnedResult.success) {
+        res.cookie('refreshToken', returnedResult.tokens.refreshToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'none',
+
+          expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        });
+        return res.json(returnedResult);
+      }
+      return res.status(401).json(returnedResult);
+    } catch (error) {
+      return res.status(500).json({
+        message: 'Internal Server Error',
+        error,
+      });
+    }
+  }
+
+  async loginAdmin(body: LoginUser, @Res() res: Response) {
+    try {
+      const response = await this.authService.send('LOGIN_ADMIN', body);
+      const returnedResult = await lastValueFrom(
+        response.pipe(map((res) => res)),
+      );
+      console.log('RETURNED RESULT', returnedResult);
+      if (returnedResult.success) {
+        res.cookie('refreshToken', returnedResult.tokens.refreshToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'none',
+
+          expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        });
+        return res.json(returnedResult);
+      }
+      return res.status(401).json(returnedResult);
+    } catch (error) {
       return res.status(500).json({
         message: 'Internal Server Error',
         error,
@@ -416,6 +482,59 @@ export class ApiGatewayService {
         return res.status(200).json(returnedResult);
       }
       return res.status(401).json(returnedResult);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        message: 'INTERNAL SERVER ERROR',
+      });
+    }
+  }
+
+  async uploadImage(
+    file: Express.Multer.File,
+    @Res() res: Response,
+    file_name: string,
+    folder_name: string,
+  ) {
+    try {
+      const response = await this.authService.send('UPLOAD_IMAGE', {
+        file,
+        file_name,
+        folder_name,
+      });
+      const returnedResult = await lastValueFrom(
+        response.pipe(map((res) => res)),
+      );
+      if (returnedResult.success) {
+        return res.status(200).json(returnedResult);
+      }
+      return res.status(401).json(returnedResult);
+    } catch (error) {
+      console.log('HANDLED EXCEPTION IN SERVICE', error);
+      return res.status(500).json({
+        message: 'INTERNAL SERVER ERROR',
+        error,
+      });
+    }
+  }
+
+  async uploadVideoWithProcessing(
+    @Res() res: Response,
+    format: string,
+    video: Express.Multer.File,
+  ) {
+    try {
+      const result = await lastValueFrom(
+        this.videoProcessingService.send('UPLOAD_VIDEO_PROCESSING', {
+          video,
+          format,
+        }),
+      );
+      console.log('RESULT OBTAINED', result);
+      if (result.success) {
+        return res.json(result);
+      }
+      return res.status(401).json(result);
     } catch (error) {
       console.log(error);
       return res.status(500).json({

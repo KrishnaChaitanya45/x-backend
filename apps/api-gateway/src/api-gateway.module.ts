@@ -21,6 +21,7 @@ import { PassportModule } from '@nestjs/passport';
     RmqModule.register({ name: 'auth' }),
     RmqModule.register({ name: 'streaming' }),
     RmqModule.register({ name: 'community' }),
+    RmqModule.register({ name: 'video-processing' }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({}),
     UtilsModule,

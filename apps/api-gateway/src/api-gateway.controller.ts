@@ -69,6 +69,27 @@ export class ApiGatewayController {
       console.log('EXCEPTION HANDLED', error);
     }
   }
+
+  // //? Admin auth routes
+
+  @Post('/auth/admin/register')
+  createAdmin(@Body() createUserDTO: RegisterDTO, @Res() res: Response) {
+    try {
+      return this.apiGatewayService.createAdmin(createUserDTO, res);
+    } catch (error) {
+      console.log('EXCEPTION HANDLED', error);
+    }
+  }
+
+  @Post('/auth/admin/login')
+  logInAdmin(@Body() createUserDTO: LoginUser, @Res() res: Response) {
+    try {
+      return this.apiGatewayService.loginAdmin(createUserDTO, res);
+    } catch (error) {
+      console.log('EXCEPTION HANDLED', error);
+    }
+  }
+
   @UseGuards(AccessTokenGuard)
   @Post('/auth/create-profile')
   createUserProfile(
@@ -107,6 +128,25 @@ export class ApiGatewayController {
   uploadVideo(@UploadedFile() file: Express.Multer.File, @Res() res: Response) {
     try {
       return this.apiGatewayService.uploadVideo(file, res);
+    } catch (error) {
+      console.log('EXCEPTION HANDLED', error);
+    }
+  }
+
+  @Post('/uploads/image')
+  @UseInterceptors(FileInterceptor('image'))
+  uploadImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: { file_name: string; folder_name: string },
+    @Res() res: Response,
+  ) {
+    try {
+      return this.apiGatewayService.uploadImage(
+        file,
+        res,
+        body.file_name,
+        body.folder_name,
+      );
     } catch (error) {
       console.log('EXCEPTION HANDLED', error);
     }

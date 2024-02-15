@@ -15,6 +15,18 @@ model Test {
 }
 
 
+model Admin{
+  id String @id @default(uuid())
+  user_name String @unique
+  first_name String?
+  last_name String?
+  password String
+  email String @unique
+  refreshToken String?
+  verificationRequests VerificationRequests[]
+  profilePhoto String?
+}
+
 model User {
   id String @id @default(uuid())
   user_name String @unique
@@ -43,6 +55,8 @@ model VerificationRequests{
   instructor Instructors? @relation(fields: [instructor_id], references: [id])
   instructor_id String @unique
   verified Boolean
+  verification Admin? @relation(fields: [verified_by], references: [id])
+  verified_by String?
   requested_on DateTime
   expires_on DateTime
 }

@@ -4,8 +4,8 @@ export type CREATE_INSTRUCTOR_DTO = {
   last_name: string;
   password: string;
   email: string;
-  skills: string[];
-  profilePhoto?: string;
+  skills?: string[];
+  profilePhoto: string;
   work_experience?: workExperience[];
   education?: string;
   phone_number: string;

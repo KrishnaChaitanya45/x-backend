@@ -54,6 +54,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/streaming/tsconfig.app.json"
       }
+    },
+    "video-processing": {
+      "type": "application",
+      "root": "apps/video-processing",
+      "entryFile": "main",
+      "sourceRoot": "apps/video-processing/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/video-processing/tsconfig.app.json"
+      }
     }
   }
 }

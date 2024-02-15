@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { BasePostgresDBService } from 'y/common';
+import { BasePostgresDBService, RedisRepository } from 'y/common';
 import * as argon from 'argon2';
 import * as bcrypt from 'bcrypt';
-import { v2 } from 'cloudinary';
+import { UploadApiErrorResponse, UploadApiResponse, v2 } from 'cloudinary';
 import { Readable } from 'stream';
+import { readdir } from 'fs/promises';
 import { DecodedUserObject } from 'libs/common/types/user/DECODED_USER';
 
 @Injectable()
@@ -62,14 +63,20 @@ export class UtilsService {
       });
     }
   }
-  async uploadImage(image: any) {
+  async uploadImage(image: any, file_name: string, folder_name: string) {
     try {
       const bufferData = Buffer.from(image.buffer.data);
       const uploadedImage = (await new Promise((resolve, reject) => {
-        const upload = v2.uploader.upload_stream((error, result) => {
-          if (error) return reject(error);
-          resolve(result);
-        });
+        const upload = v2.uploader.upload_stream(
+          {
+            folder: folder_name,
+            public_id: file_name,
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          },
+        );
 
         const readableStream = new Readable(); // Import 'Readable' if necessary
         readableStream.push(bufferData);
@@ -140,6 +147,115 @@ export class UtilsService {
       return user;
     } catch (error) {
       return null;
+    }
+  }
+
+  async uploadProcessedVideo(
+    processId?: string,
+    dirName?: string,
+    redis?: RedisRepository,
+    updateProgress?: (
+      message: string,
+      redis: RedisRepository,
+      videoId: string,
+    ) => void,
+  ): Promise<{
+    success: boolean;
+    message: string;
+    url?: string;
+  }> {
+    // TODO
+    //? --> Fetch the files from the processed_video directory
+    //? --> Upload the files to the cloud storage
+    //? --> Return the uploaded file URL
+    //? --> The files should be deleted after successful upload
+
+    try {
+      updateProgress(
+        'Started Reading Directory For Uploading Files',
+        redis,
+        processId,
+      );
+      const directoryData = await readdir(dirName);
+      console.log('Directory Data', directoryData);
+
+      updateProgress('Uploading Files To Cloud Storage', redis, processId);
+      for (const file of directoryData) {
+        updateProgress(
+          `Uploading ${directoryData.indexOf(file) + 1} files out of ${
+            directoryData.length
+          }`,
+          redis,
+          processId,
+        );
+        (await new Promise((resolve, reject) => {
+          const upload = v2.uploader.upload(
+            `processed_videos/${file}`,
+            {
+              resource_type: 'raw',
+              folder: processId,
+              public_id: file,
+            },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result);
+            },
+          );
+        })) as UploadApiResponse | UploadApiErrorResponse;
+        console.log(
+          `UPLOADED ${directoryData.indexOf(file) + 1} FILES OUT OF ${
+            directoryData.length
+          }`,
+        );
+        updateProgress(
+          `UPLOADED ${directoryData.indexOf(file) + 1} FILES OUT OF ${
+            directoryData.length
+          }`,
+          redis,
+          processId,
+        );
+      }
+      console.log('UPLOADED ALL FILES');
+      updateProgress(`Video Uploaded Successfully`, redis, processId);
+      return {
+        success: true,
+        message: 'Video uploaded successful',
+      };
+    } catch (error) {
+      updateProgress(`Video Uploading Failed`, redis, processId);
+      console.log('ERROR' + JSON.stringify(error));
+      return {
+        success: false,
+        message: 'Video processing failed',
+      };
+    }
+  }
+
+  async uploadRawVideo() {
+    //TODO
+    //? --> Upload the raw video to the cloud storage
+    //? --> Return the uploaded file URL
+    try {
+      const uploadedVideo = (await new Promise((resolve, reject) => {
+        const upload = v2.uploader.upload_stream(
+          {
+            folder: 'raw_videos',
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          },
+        );
+
+        const readableStream = new Readable(); // Import 'Readable' if necessary
+        readableStream.push('video.mp4');
+        readableStream.push(null); // Signals the end of the stream
+
+        readableStream.pipe(upload);
+      })) as any;
+      console.log(uploadedVideo);
+    } catch (error) {
+      console.log('ERROR' + JSON.stringify(error));
     }
   }
 }

@@ -2,14 +2,16 @@ export class CreateProfileDTO {
   first_name: string;
   last_name: string;
   location: string;
+  user_name: string;
+  password: string;
   education: string;
-  socials: {
+  socials?: {
     twitter?: string;
     instagram?: string;
     linkedin?: string;
     github?: string;
   };
-  interests: string[];
+  interests?: string[];
   //WorkEx
   work_experience?: {
     company: string;

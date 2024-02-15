@@ -51,6 +51,7 @@ export class AuthService {
 
   async registerInstructor(body: any) {
     try {
+      console.log('REGISTER INSTRUCTOR BODY', body);
       const hashedPassword = await this.utilsService.hashData(body.password);
       const findUser = await this.prisma.instructors.findFirst({
         where: {
@@ -102,9 +103,10 @@ export class AuthService {
         tokens,
       };
     } catch (error) {
+      console.log(error);
       return {
         success: false,
-        error: error.response,
+        error: error,
       };
     }
   }
@@ -204,7 +206,11 @@ export class AuthService {
   }
   async uploadProfilePhoto(file: Express.Multer.File, userId: string) {
     try {
-      const uploadedImage = await this.utilsService.uploadImage(file);
+      const uploadedImage = await this.utilsService.uploadImage(
+        file,
+        userId,
+        'student-profiles',
+      );
       if (!uploadedImage.success) {
         throw new Error(uploadedImage.message);
       }
@@ -247,8 +253,7 @@ export class AuthService {
         data: {
           first_name,
           last_name,
-          //@ts-expect-error skills are not defined for now
-          skills: skills,
+          // skills: skills,
           education,
           achievements,
           work_experience,
@@ -277,6 +282,26 @@ export class AuthService {
         success: true,
         instructors,
       };
+    } catch (error) {
+      return {
+        success: false,
+        error,
+      };
+    }
+  }
+
+  async uploadImage(
+    file: Express.Multer.File,
+    file_name: string,
+    folder_name: string,
+  ) {
+    try {
+      const uploadedImage = await this.utilsService.uploadImage(
+        file,
+        file_name,
+        folder_name,
+      );
+      return uploadedImage;
     } catch (error) {
       return {
         success: false,

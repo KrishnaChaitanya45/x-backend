@@ -12,7 +12,10 @@ export class AuthController {
   }
 
   @MessagePattern('REGISTER_INSTRUCTOR')
-  async registerInstructor(@Body() body: any) {
+  async registerInstructor(@Ctx() context: any) {
+    const {
+      data: { body },
+    } = JSON.parse(context.getMessage().content.toString());
     return this.authService.registerInstructor(body);
   }
   @MessagePattern('LOGIN_INSTRUCTOR')
@@ -39,6 +42,13 @@ export class AuthController {
     return this.authService.uploadProfilePhoto(file, user.userId);
   }
 
+  @MessagePattern('UPLOAD_IMAGE')
+  async uploadImage(@Ctx() context: RmqContext, @Body() body: any) {
+    const {
+      data: { file, file_name, folder_name },
+    } = JSON.parse(context.getMessage().content.toString());
+    return this.authService.uploadImage(file, file_name, folder_name);
+  }
   @MessagePattern('CREATE_USER_PROFILE')
   async createUserProfile(@Ctx() context: RmqContext) {
     const {

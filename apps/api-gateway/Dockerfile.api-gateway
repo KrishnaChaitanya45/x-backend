@@ -1,0 +1,11 @@
+# Dockerfile.api-gateway
+FROM base as development
+
+WORKDIR /app
+RUN npm run build api-gateway
+
+FROM base as production
+
+WORKDIR /app
+COPY --from=development /app/dist ./dist
+CMD ["node", "dist/apps/api-gateway/main"]

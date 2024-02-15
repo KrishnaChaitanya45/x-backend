@@ -7,8 +7,10 @@ export type COURSE_CONTENT = {
   unique_name: string;
   topics: object;
   icon?: string;
+  isVideo: boolean;
   bg_image?: string;
   video_link: string;
   challenges: object;
   module_id: string;
+  resource_link?: string[];
 };

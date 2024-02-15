@@ -26,6 +26,7 @@ export class RmqModule {
                 urls: [
                   `amqp://Nishant:Nishant@${RABBITMQ_CONTAINER_NAME}:5672`,
                 ],
+
                 queue: name,
               },
             }),
